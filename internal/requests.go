@@ -15,5 +15,5 @@ func (c *Client) ListAreas() (LocationsFromJSON, error) {
 
 	}
 
-	res, e := 
+	
 }
