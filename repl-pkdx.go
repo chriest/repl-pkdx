@@ -9,7 +9,7 @@ import (
 type cliMethods struct {
 	name 		string
 	description	string
-	callback 	func() error
+	callback 	func(*con, ...string) error
 }
 
 func getCommands() map[string]cliMethods {
@@ -30,6 +30,11 @@ func getCommands() map[string]cliMethods {
 				description:	"Show the next 20 locations",
 				callback:		mapCommand,
 			},
+			"explore": {
+				name: "explore",
+				description: "Pokemons in your area",
+				callback: explore,
+			},
 			"mapb": {
 				name:			"mapb",
 				description:	"Shows the 20 locations before",
@@ -38,16 +43,21 @@ func getCommands() map[string]cliMethods {
 		}
 }
 
-func repl() {
+func repl(configure *con) {
 		inBuf := bufio.NewScanner(os.Stdin);
 		input := ""
 		
 		
 		fmt.Print("pokedex > ")
+		args:=[]string{}
 		for inBuf.Scan(){
-			input = formatter(inBuf.Text())
+			clean:=formatter(inBuf.Text())
+			if len(clean)>1{
+				args=clean[1:]
+			}
+			input = clean[0]
 			if comm, errNone := getCommands()[input]; errNone {
-				e := comm.callback()
+				e  := comm.callback(configure, args...)
 				if e != nil {
 					fmt.Println(e)
 				}
@@ -56,8 +66,4 @@ func repl() {
 			}
 			fmt.Print("pokedex > ")
 		}
-}
-
-func main(){
-	repl()
 }
