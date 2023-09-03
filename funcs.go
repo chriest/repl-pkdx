@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"errors"
+	"math/rand"
 )
 
 
@@ -72,12 +73,71 @@ func explore(cf *con, args ...string) error{
 		fmt.Println("error")
 	}
 	fmt.Printf("In %v:", locationArea.Name)
-	fmt.Println("")
+	fmt.Println("git ")
 
 	for _, item := range locationArea.PokemonEncounters {
 		fmt.Print(" - ")
 		fmt.Println(item.Pokemon.Name)
 	}
+	return nil
+
+}
+
+func inspect(cf *con, args ...string) error{
+	if len(args)!=1{
+		return errors.New("err")
+	}
+	pokemonName:=args[0]
+
+	pokemon, err := cf.catchers[pokemonName]
+
+	if !err {
+		return errors.New("pokemon not caught")
+	}
+	
+	fmt.Printf("Name %v\n", pokemon.Name)
+	fmt.Printf("Height %v\n", pokemon.Height)
+	fmt.Printf("Weight %v\n", pokemon.Weight)
+	/*for _, stt := range pokemon.Stat {
+	fmt.Printf(" %v: %v", stt.Stat.Name, stt.Stat.BaseStat)
+	}*/
+
+
+	return nil
+
+}
+
+func pokedex(cf *con, args ...string) error{
+	fmt.Println("Printing Pokedex: ")
+
+	for _, pokemon := range cf.catchers{
+		fmt.Println(pokemon.Name)
+	}
+
+
+	return nil
+
+}
+
+func catch(cf *con, args ...string) error{
+	if len(args)!=1{
+		return errors.New("err")
+	}
+	pokemonName:=args[0]
+
+	pokemon, err := cf.Client.GetPokemons(pokemonName)
+	if err!= nil {
+		fmt.Println("error")
+	}
+	threshold := 50
+	randGen := rand.Intn(pokemon.BaseExperience)
+	if randGen < threshold {
+		cf.catchers[pokemonName] = pokemon
+		fmt.Printf("Pokemon caught: %v\n", pokemonName)
+	} else {
+		return fmt.Errorf("pokemon not caught")
+	}
+
 	return nil
 
 }

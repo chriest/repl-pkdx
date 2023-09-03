@@ -117,3 +117,57 @@ func (c *Client) GetAreas(locationName string) (LocationAreas, error) {
 
 	return locationAreas, err
 }
+
+func (c *Client) GetPokemons(pokemonName string) (Pokemons, error) {
+
+	endpoint := "/pokemon/" + pokemonName
+	fullURL := baseURL + endpoint
+
+	data, o := c.cache.Get(fullURL)
+	if o {
+		
+		pokemon := Pokemons{}
+		err := json.Unmarshal(data, &pokemon)
+		if err!= nil {
+			return Pokemons{}, err
+		}
+		//fmt.Println("hit")
+		return pokemon, err
+
+	}
+	//fmt.Println("miss")
+	// richiesta
+	req, err := http.NewRequest("GET", fullURL, nil)
+
+	if err!= nil {
+		return Pokemons{}, err
+	}
+	// esecuzione richiesta
+	res, e := c.httpClient.Do(req)
+
+	if e!= nil {
+		return Pokemons{}, err
+	}
+	// controllo risposta
+	 if res.StatusCode > 299 {
+		return Pokemons{}, fmt.Errorf("error: %v", res.StatusCode)
+	 }
+
+	 reqData, err := io.ReadAll(res.Body)
+	 defer res.Body.Close()
+
+	 if err!= nil {
+		return Pokemons{}, err
+	}
+
+	// init struttura derivata da GO>JSON
+	pokemon := Pokemons{}
+
+	err = json.Unmarshal(reqData, &pokemon)
+	if err!= nil {
+		return Pokemons{}, err
+	}
+	c.cache.Add(fullURL, reqData)
+
+	return pokemon, err
+}

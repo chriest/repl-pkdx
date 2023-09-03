@@ -35,6 +35,21 @@ func getCommands() map[string]cliMethods {
 				description: "Pokemons in your area",
 				callback: explore,
 			},
+			"inspect": {
+				name: "inspect",
+				description: "Provides caught Pokemon",
+				callback: inspect,
+			},
+			"pokedex":{
+				name: "pokedex",
+				description: "Provides caught Pokemons",
+				callback: pokedex,
+			},
+			"catch": {
+				name: "catch",
+				description: "Attempts to catch a Pokèmon",
+				callback: catch,
+			},
 			"mapb": {
 				name:			"mapb",
 				description:	"Shows the 20 locations before",
